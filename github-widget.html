@@ -1,0 +1,149 @@
+<html><body><style type="text/css">
+body {
+    color: #666;
+    font: 13px helvetica,arial,freesans,clean,sans-serif;
+    line-height: 1.4;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+a {
+    color: #4183C4;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+#gh-widget {
+    border: 1px solid #666;
+    overflow: hidden;
+}
+#gh-widget-top {
+    background-color: #333;
+    color: #e6e6e7;
+    padding: 7px 10px;
+    overflow: hidden;
+}
+#gh-widget-top span {
+    float: left;
+    margin: 2px 0 0;
+}
+#gh-widget-top a {
+    float:right;
+}
+#gh-widget-head {
+    border-bottom: 1px solid #CCC;
+    padding: 2px 5px 5px;
+    margin: 5px;
+}
+#gh-repo-name {
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: capitalize;    
+}
+#gh-repo-description {
+    margin: 5px 0 0;
+    padding: 0;
+}
+#gh-widget-body {
+    padding: 0 5px;
+    margin: 5px;
+}
+#gh-repo-info {
+    font-size: 11px;
+}
+#gh-repo-watchers {
+    margin: 8px 0 0;
+    padding: 0;
+    overflow: hidden;
+    width: 105%;
+}
+#gh-repo-watchers li {
+    color: #999;
+    float:left;
+    font-size: 10px;
+    height: 68px;
+    list-style: none;
+    margin: 0 5px 5px 0;
+    overflow: hidden;
+    padding: 0;
+    text-align: center;
+    width: 50px;
+    word-wrap: break-word;
+}
+#gh-repo-watchers li a {
+    color: #999;
+}
+#gh-repo-watchers li img {
+    display: block;
+    margin-bottom: 2px;
+}
+</style>
+<div id="gh-widget">
+    <div id="gh-widget-top">
+        <span>Fork us on Github</span>
+        <a href="https://github.com/" title="Github.com" target="_blank"><img src="github-logo.png" alt="Github.com" title="Github.com" /></a>
+    </div>
+    <div id="gh-widget-head">
+        <a href="" id="gh-repo-name" target="_blank"></a>
+        <p id="gh-repo-description"></p>
+    </div>  
+    <div id="gh-widget-body">
+        <div id="gh-repo-info"></div>
+        <ul id="gh-repo-watchers"></ul>
+    </div>  
+</div>
+<script type="text/javascript">
+  var params = function () {
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++) {
+      hash = hashes[i].split('=');
+      vars.push(hash[0]);
+      vars[hash[0]] = hash[1];
+    }
+    return vars;
+  }()
+  var user = params.user,
+      repo = params.repo,
+      head = document.getElementsByTagName('head')[0],
+      title = document.getElementById('gh-repo-name'),
+      desc = document.getElementById('gh-repo-description'),
+      info = document.getElementById('gh-repo-info'),
+      watchers = document.getElementById('gh-repo-watchers');
+
+
+  // Add commas to numbers
+  function addCommas(n) {
+    return n.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,')
+  }
+
+  function jsonp(path, func) {
+    var el = document.createElement('script');
+    el.src = path + '?callback=' + func +'';
+    head.insertBefore(el, head.firstChild);
+  }
+
+  function buildRepo(obj) {
+     title.href = 'https://github.com/' + user + '/' + repo + '/';
+     title.innerHTML = obj.data.name;
+     desc.innerHTML = obj.data.description;
+     info.innerHTML = 'This repository has <a href="https://github.com/' + user + '/' + repo + '/watchers" target="_blank">' + addCommas(obj.data.watchers) + ' watchers</a> and <a href="https://github.com/' + user + '/' + repo + '/network" target="_blank">'+ addCommas(obj.data.forks) +' forks</a>.';
+  }
+  
+  function buildWatchersHTML(obj){
+      var user_name = obj.data.name ? obj.data.name : obj.data.login;   
+         
+      watchers.innerHTML += '<li><a href="https://github.com/'+ obj.data.login +'" target="_blank"><img src="'+ obj.data.avatar_url +'" width="50" height="50" />' + user_name + '</a></li>';
+  }
+  
+  function buildWatchers(obj) {     
+     for ( i=0; i<10; i++ ) {
+         jsonp('https://api.github.com/users/' + obj.watchers[ Math.floor( Math.random() * obj.watchers.length ) ], 'buildWatchersHTML');
+     }
+  }
+  
+  jsonp('https://api.github.com/repos/' + user + '/' + repo, 'buildRepo');
+  jsonp('https://github.com/api/v2/json/repos/show/' + user + '/' + repo + '/watchers', 'buildWatchers');
+    
+</script></body></html>
