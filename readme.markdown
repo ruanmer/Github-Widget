@@ -15,3 +15,6 @@ Code:
 - Improve code
 - Add a 'stream' option (Commit History)
 - Maybe an option for users
+
+
+Code based on: https://github.com/markdotto/github-buttons
